@@ -1,5 +1,6 @@
 import {ErrorMessage, Form, Field, Formik, useFormik, useField, getIn} from 'formik';
 import './loginForm.css';
+import {useState} from "react";
 
 
 function validate(values){
@@ -72,6 +73,7 @@ const styleError = {
 
 function LoginForm() {
 
+    const [isLoading, setLoading] = useState(false);
     return (
         <Formik
             initialValues={{
@@ -81,42 +83,53 @@ function LoginForm() {
             }}
             validate={validate}
             onSubmit={(values, {resetForm, setSubmitting}) =>{
+                setLoading(true);
                 setTimeout(()=>{
+                    setLoading(false);
                     alert(JSON.stringify(values, null, 2));
                     setSubmitting(false);
                     resetForm();
-                },400)
+                },1000);
+
             }}
             >
             <Form>
-                <label htmlFor="email">Email Address</label>
-                <Field name="email" type="email">
-                    {({ field, form }) => (
-                        <input
-                            style={form.touched.email && form.errors.email ? styleError : style}
-                            {...field}
-                        />
-                    )}
-                </Field>
-                <ErrorMessage name="email">{msg => <div style={{color:'red'}}>{msg}</div>}</ErrorMessage>
-                <label htmlFor="password">Password</label>
-                <Field name="password" type="password">
-                    {({ field, form }) => (
-                        <input
-                            style={form.touched.password && form.errors.password ? styleError : style}
-                            {...field}
-                        />
-                    )}
-                </Field>
-                <ErrorMessage name="password">{msg => <div style={{color:'red'}}>{msg}</div>}</ErrorMessage>
+                <div className="form-group">
+                    <label htmlFor="email">Email Address</label>
+                    <Field name="email">
+                        {({ field, form }) => (
+                            <input className="form-control" type="email"
+                                style={form.touched.email && form.errors.email ? styleError : style}
+                                {...field}
+                            />
+                        )}
+                    </Field>
+                    <ErrorMessage name="email">{msg => <div style={{color:'red'}}>{msg}</div>}</ErrorMessage>
+                </div>
+                <div className="form-group">
+                    <label htmlFor="password">Password</label>
+                    <Field name="password">
+                        {({ field, form }) => (
+                            <input className="form-control" type="password"
+                                style={form.touched.password && form.errors.password ? styleError : style}
+                                {...field}
+                            />
+                        )}
+                    </Field>
+                    <ErrorMessage name="password">{msg => <div style={{color:'red'}}>{msg}</div>}</ErrorMessage>
+                </div>
                 <MyCheckbox name="rememberMe">
                     Remember me
                 </MyCheckbox>
-                <button type="submit">Connect</button>
+                <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                    {isLoading?<div className="spinner-border spinner-border-sm"></div> : 'Connect'}
+                </button>
             </Form>
         </Formik>
     );
 }
+
+//TODO Add EmailInput && PasswordInput
 
 function MyTextInput({label, ...props}){
     const [field, meta] = useField(props);
@@ -135,8 +148,8 @@ function MyCheckbox({ children, ...props }){
     const [field, meta] = useField({ ...props, type: 'checkbox' });
     return (
         <div>
-            <label className="checkbox">
-                <input type="checkbox" {...field} {...props} />
+            <label className="checkbox form-check">
+                <input type="checkbox" className="form-check-input" {...field} {...props} />
                 {children}
             </label>
             {meta.touched && meta.error ? (
