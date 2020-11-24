@@ -2,6 +2,9 @@ import {ErrorMessage, Form, Field, Formik, useFormik, useField, getIn} from 'for
 import './loginForm.css';
 import {useState} from "react";
 
+import firebase from "firebase";
+import 'firebase/firestore';
+import 'firebase/auth';
 
 function validate(values){
     const errors = {};
@@ -72,60 +75,68 @@ const styleError = {
 }
 
 function LoginForm() {
+    const auth = firebase.auth();
+    const signInWithGoogle = () => {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        auth.signInWithPopup(provider);
+    }
 
     const [isLoading, setLoading] = useState(false);
     return (
-        <Formik
-            initialValues={{
-                email: '',
-                password: '',
-                rememberMe: false
-            }}
-            validate={validate}
-            onSubmit={(values, {resetForm, setSubmitting}) =>{
-                setLoading(true);
-                setTimeout(()=>{
-                    setLoading(false);
-                    alert(JSON.stringify(values, null, 2));
-                    setSubmitting(false);
-                    resetForm();
-                },1000);
+        <div>
+            <Formik
+                initialValues={{
+                    email: '',
+                    password: '',
+                    rememberMe: false
+                }}
+                validate={validate}
+                onSubmit={(values, {resetForm, setSubmitting}) =>{
+                    setLoading(true);
+                    setTimeout(()=>{
+                        setLoading(false);
+                        alert(JSON.stringify(values, null, 2));
+                        setSubmitting(false);
+                        resetForm();
+                    },1000);
 
-            }}
-            >
-            <Form>
-                <div className="form-group">
-                    <label htmlFor="email">Email Address</label>
-                    <Field name="email">
-                        {({ field, form }) => (
-                            <input className="form-control" type="email"
-                                style={form.touched.email && form.errors.email ? styleError : style}
-                                {...field}
-                            />
-                        )}
-                    </Field>
-                    <ErrorMessage name="email">{msg => <div style={{color:'red'}}>{msg}</div>}</ErrorMessage>
-                </div>
-                <div className="form-group">
-                    <label htmlFor="password">Password</label>
-                    <Field name="password">
-                        {({ field, form }) => (
-                            <input className="form-control" type="password"
-                                style={form.touched.password && form.errors.password ? styleError : style}
-                                {...field}
-                            />
-                        )}
-                    </Field>
-                    <ErrorMessage name="password">{msg => <div style={{color:'red'}}>{msg}</div>}</ErrorMessage>
-                </div>
-                <MyCheckbox name="rememberMe">
-                    Remember me
-                </MyCheckbox>
-                <button type="submit" className="btn btn-primary" disabled={isLoading}>
-                    {isLoading?<div className="spinner-border spinner-border-sm"></div> : 'Connect'}
-                </button>
-            </Form>
-        </Formik>
+                }}
+                >
+                <Form>
+                    <div className="form-group">
+                        <label htmlFor="email">Email Address</label>
+                        <Field name="email">
+                            {({ field, form }) => (
+                                <input className="form-control" type="email"
+                                    style={form.touched.email && form.errors.email ? styleError : style}
+                                    {...field}
+                                />
+                            )}
+                        </Field>
+                        <ErrorMessage name="email">{msg => <div style={{color:'red'}}>{msg}</div>}</ErrorMessage>
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="password">Password</label>
+                        <Field name="password">
+                            {({ field, form }) => (
+                                <input className="form-control" type="password"
+                                    style={form.touched.password && form.errors.password ? styleError : style}
+                                    {...field}
+                                />
+                            )}
+                        </Field>
+                        <ErrorMessage name="password">{msg => <div style={{color:'red'}}>{msg}</div>}</ErrorMessage>
+                    </div>
+                    <MyCheckbox name="rememberMe">
+                        Remember me
+                    </MyCheckbox>
+                    <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                        {isLoading?<div className="spinner-border spinner-border-sm"></div> : 'Connect'}
+                    </button>
+                </Form>
+            </Formik>
+            <button className="sign-in" onClick={signInWithGoogle}>Sign in with Google</button>
+        </div>
     );
 }
 
