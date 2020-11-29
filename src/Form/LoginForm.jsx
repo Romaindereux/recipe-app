@@ -114,6 +114,8 @@ function LoginForm() {
                         .then(res=>{
                             console.log(res.user);
                         }).catch(e => {
+                            setLoading(false);
+                            //TODO display error
                             console.error(e.message);
                         });
 
